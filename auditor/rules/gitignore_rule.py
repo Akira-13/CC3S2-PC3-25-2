@@ -11,8 +11,8 @@ class GitignoreEnvRule(Rule):
     def check(self, ctx: RuleContext) -> List[Finding]:
         repo = Path(ctx.repo_root)
         gi = repo / ".gitignore"
-        lines = [l.strip() for l in read_lines(gi)]
-        has_env = any(l == ".env" or l.endswith("/.env") for l in lines)
+        lines = [line.strip() for line in read_lines(gi)]
+        has_env = any(line == ".env" or line.endswith("/.env") for line in lines)
 
         if not lines: # .gitignore faltante
             return [
