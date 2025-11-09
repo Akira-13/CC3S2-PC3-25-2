@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import List, Set
 import re
 
-from auditor.core import Finding, RuleContext, Severity
+from auditor.core import Finding, Rule, RuleContext, Severity
 from auditor.utils.fs import read_lines
 
 
-class MakefileRule:
+class MakefileRule(Rule):
     """
     R003: Verificar Makefile y targets mínimos.
     Targets requeridos: run, test, lint, plan, apply

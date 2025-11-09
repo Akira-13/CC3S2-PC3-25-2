@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import List
 import re
 
-from auditor.core import Finding, RuleContext, Severity
+from auditor.core import Finding, Rule, RuleContext, Severity
 from auditor.utils.fs import read_lines
 
 
-class ConfigViaEnvRule:
+class ConfigViaEnvRule(Rule):
     """
     R002: La configuración debe realizarse vía variables de entorno.
     Heurística D2:
