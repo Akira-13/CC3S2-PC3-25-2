@@ -1,0 +1,31 @@
+name: ci
+on:
+    push:
+        branches: [ main, develop ]
+    pull_request:
+        branches: [ main, develop ]
+
+jobs:
+    build-test:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+            -   name: Setup Python
+                uses: actions/setup-python@v5
+                with:
+                    python-version: "3.11"
+            -   name: Install dev dependencies
+                run: |
+                    python -m pip install --upgrade pip
+                    pip install -r requirements-dev.txt
+            -   name: Lint
+                run: ruff check auditor tests
+            -   name: Tests + coverage XML
+                run: pytest -vv --cov=auditor --cov-report=xml
+            -   name: Coverage gate 
+                run: python tools/read_coverage.py 85
+            -   name: Secret scan (gitleaks)
+                uses: zricethezav/gitleaks-action@v2
+                with:
+                    args: detect --no-banner --redact --exit-code 1
