@@ -8,6 +8,9 @@ from auditor.core import RuleContext, run_rules, Finding, Severity
 from auditor.rules.gitignore_rule import GitignoreEnvRule
 from auditor.rules.config_rule import ConfigViaEnvRule
 from auditor.rules.makefile_rule import MakefileRule
+from auditor.rules.license_rule import LicenseRule
+from auditor.rules.coverage_rule import CoverageRule
+from auditor.rules.secrets_rule import SecretsRule
 
 
 SEVERITY_ORDER = {Severity.LOW: 1, Severity.MEDIUM: 2, Severity.HIGH: 3}
@@ -66,6 +69,9 @@ def main(argv: list[str] | None = None) -> int:
         GitignoreEnvRule(),
         ConfigViaEnvRule(),
         MakefileRule(),
+        LicenseRule(),      
+        CoverageRule(),     
+        SecretsRule(),      
     ]
 
     findings = run_rules(ctx, rules)
