@@ -11,11 +11,27 @@ Estructura mínima del auditor con las primeras reglas y un flujo de trabajo imp
 * **R005**: La cobertura de código debe ser de al menos 90% (verifica archivo coverage.xml).
 * **R006**: No deben existir secretos expuestos en el código (API keys, tokens, contraseñas, etc.).
 
-## Estructura del proyecto (parcial)
+## Renderizador de Reportes
+
+El módulo de reporting permite generar informes en formato Markdown a partir de los resultados del auditor.
+
+1. **Generar el reporte JSON**:
+   ```bash
+   python -m auditor --repo . --output report.json
+   ```
+
+2. **Convertir a Markdown**:
+   ```bash
+   python -m auditor.reporting.md_renderer --input report.json --output report.md
+   ```
+
+## Estructura del proyecto
 
 ```
 auditor/
   core.py            # Finding, Severity, RuleContext, run_rules
+  reporting/         # Módulo de generación de reportes
+    md_renderer.py   # Generador de reportes Markdown
   utils/fs.py        # Helpers del sistema de archivos
   rules/
     gitignore_rule.py  # R001
