@@ -18,3 +18,6 @@ pythonpath = ["."]
 line-length = 100
 target-version = "py311"
 exclude = ["tests/*", ".pytest_cache", "build", "dist"]
+
+[tool.setuptools]
+packages = ["auditor"]
