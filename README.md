@@ -7,6 +7,9 @@ Estructura mínima del auditor con las primeras reglas y un flujo de trabajo imp
 * **R001**: `.env` debe estar listado en `.gitignore`.
 * **R002**: **Configuración vía variables de entorno** (heurística).
 * **R003**: El **Makefile** debe incluir objetivos requeridos (`run`, `test`, `lint`, `plan`, `apply`).
+* **R004**: El repositorio debe tener un archivo de licencia válido (LICENSE, LICENSE.txt, COPYING, etc.).
+* **R005**: La cobertura de código debe ser de al menos 90% (verifica archivo coverage.xml).
+* **R006**: No deben existir secretos expuestos en el código (API keys, tokens, contraseñas, etc.).
 
 ## Estructura del proyecto (parcial)
 
@@ -18,6 +21,9 @@ auditor/
     gitignore_rule.py  # R001
     config_rule.py     # R002
     makefile_rule.py   # R003
+    license_rule.py    # R004
+    coverage_rule.py   # R005
+    secrets_rule.py    # R006
 tests/
 Makefile
 pyproject.toml
