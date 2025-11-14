@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
-from typing import List, Set, Pattern
+from typing import List, Pattern
 import re
 
 from auditor.core import Finding, Rule, RuleContext, Severity
