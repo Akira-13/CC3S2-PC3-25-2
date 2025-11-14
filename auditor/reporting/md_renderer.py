@@ -46,13 +46,15 @@ def parse_findings(report_data: Dict) -> List[Finding]:
     findings = []
     for finding_data in report_data.get('findings', []):
         try:
+            # Obtener metadatos adicionales
+            meta = finding_data.get('meta', {})
             finding = Finding(
                 rule_id=finding_data.get('rule_id', 'unknown'),
-                file=finding_data.get('file', ''),
+                file=finding_data.get('path', ''),  # Usar 'path' en lugar de 'file'
                 message=finding_data.get('message', ''),
                 severity=finding_data.get('severity', 'low').lower(),
-                line=finding_data.get('line'),
-                context=finding_data.get('context')
+                line=meta.get('line'),  # Obtener la línea de los metadatos
+                context=meta.get('context')
             )
             findings.append(finding)
         except (TypeError, ValueError) as e:
@@ -140,8 +142,10 @@ def generate_markdown(report_data: Dict) -> str:
         
         for finding in sorted(findings_list, key=lambda x: (x.file, x.line or 0)):
             line_num = str(finding.line) if finding.line is not None else 'N/A'
+            
+            file_path = finding.file if hasattr(finding, 'file') and finding.file else 'N/A'
             lines.append(
-                f"| {finding.rule_id} | `{finding.file}` | {line_num} | {finding.message} |"
+                f"| {finding.rule_id} | `{file_path}` | {line_num} | {finding.message} |"
             )
         
         lines.append('')
