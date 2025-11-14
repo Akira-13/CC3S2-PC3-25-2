@@ -2,8 +2,6 @@ name: Compliance Audit with Artifact Upload
 
 on:
   pull_request:
-  push:
-    branches: [main]
 
 jobs:
   audit:
