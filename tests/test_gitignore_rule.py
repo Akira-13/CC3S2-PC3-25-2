@@ -11,7 +11,7 @@ from auditor.rules import GitignoreEnvRule
 @pytest.mark.parametrize(
     "gitignore_content, expected_findings",
     [
-        ("", 1), # no .gitignore (simulamos escribiendo nada y borrando archivo)
+        ("", 1), # no .gitignore 
         ("# base\n*.pyc\n", 1), # sin .env
         ("# base\n.env\n*.pyc\n", 0), # con .env
     ],

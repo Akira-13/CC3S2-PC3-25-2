@@ -1,4 +1,3 @@
-# tests/test_core_runner_errors.py
 from __future__ import annotations
 from dataclasses import dataclass
 import importlib
