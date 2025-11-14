@@ -23,8 +23,8 @@ jobs:
                 run: ruff check auditor tests
             -   name: Tests + coverage XML
                 run: pytest -vv --cov=auditor --cov-report=xml
-            -   name: Coverage gate 
-                run: python tools/read_coverage.py 85
+            -   name: Coverage
+                run: pytest -vv --maxfail=1 --cov=auditor --cov-report=term-missing --cov-report=xml
             -   name: Secret scan (gitleaks)
                 uses: zricethezav/gitleaks-action@v2
                 with:
