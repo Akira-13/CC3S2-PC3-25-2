@@ -1,0 +1,36 @@
+name: Compliance Audit with Artifact Upload
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip
+          python -m pip install pytest
+          python -m pip install .
+
+      - name: Run compliance auditor
+        run: |
+          python -m auditor --repo . --output report.json --fail-on high
+
+      - name: Upload audit report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-report
+          path: report.json
