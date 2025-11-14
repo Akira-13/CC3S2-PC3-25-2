@@ -3,6 +3,7 @@ from pathlib import Path
 import tempfile
 
 from auditor.core import RuleContext
+
 from auditor.rules.makefile_rule import MakefileRule
 
 

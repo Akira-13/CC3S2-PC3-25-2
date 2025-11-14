@@ -57,7 +57,6 @@ test:
 * `make run`
   Alias para ejecutar los tests rápidamente.
 
-
 ## Inicio rápido
 
 ```bash
@@ -66,3 +65,77 @@ python -m pip install -r requirements
 make test
 make lint
 ```
+
+---
+
+## Pruebas y fixtures (Sprint 1)
+
+Trabajo realizado en este sprint para asegurar calidad y verificabilidad del auditor:
+
+* **Fixtures realistas**:
+
+  * `good_repo`: crea estructura mínima válida con `.gitignore`, `LICENSE`, `Makefile`, `src/…`.
+  * `bad_repo`: crea estructura intencionalmente incompleta para provocar findings.
+* **Parametrización exhaustiva**:
+
+  * Bordes de cobertura en `test_rule_coverage_min.py` (p. ej., `0.899`, `0.90`, `0.92`).
+  * Variantes de licencia en `test_rule_license_present.py` (formatos aceptados y vacíos).
+* **Smokes de la CLI**:
+
+  * Ejecutan `auditor.cli` contra repos “bueno/malo”.
+  * En el “repo bueno” se genera un `coverage.xml` sintético con `line-rate ≥ 0.90` para no disparar falsos positivos de cobertura.
+* **Mocks disciplinados**:
+
+  * Uso de `patch.object(..., autospec=True)` y verificación de llamadas donde aplica.
+* **Buenas prácticas de test**:
+
+  * Uso sistemático de `tmp_path` para aislar filesystem.
+  * Casos límite y errores controlados (p. ej., excepción al leer `LICENSE`).
+
+### Estructura de tests (resumen)
+
+```
+tests/
+  conftest.py                  # good_repo / bad_repo
+  test_cli_smoke.py            # smokes de CLI con repos sintéticos
+  test_config_rule.py
+  test_core_runner_errors.py   # captura de excepciones en run_rules
+  test_coverage_boundaries.py
+  test_gitignore_env_fs_mock.py
+  test_gitignore_env_param.py
+  test_gitignore_rule.py
+  test_license_io_error.py     # rama de error al leer licencia
+  test_makefile_rule.py
+  test_makefile_targets_param.py
+  test_rule_coverage_min.py
+  test_rule_license_present.py
+  test_rule_secrets_none.py
+  test_secrest_multifile.py    # detección de secretos en múltiples archivos
+  test_utils.py
+```
+
+## Cómo ejecutar la suite y medir cobertura
+
+```bash
+pytest -vv --maxfail=1
+pytest -vv --cov=auditor --cov-report=term-missing --cov-report=xml
+```
+
+**Gate de cobertura (S1 ≥ 85%):**
+
+```bash
+python tools/read_coverage.py 85
+```
+
+> Estado actual: **~93%** de cobertura (pasa el gate de S1 con holgura).
+
+## Notas útiles para correr localmente
+
+* Si la CLI o los smokes reportan un hallazgo inesperado en el “repo bueno”, verifica que el test haya generado `coverage.xml` con `line-rate ≥ 0.90`.
+* Para ver líneas no cubiertas: usar `--cov-report=term-missing`.
+
+## CI (S1) — verificación de calidad
+
+* **Lint** con `ruff`.
+* **Tests + coverage** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
+* Escaneo de secretos (acción separada en el pipeline).

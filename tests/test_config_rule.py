@@ -1,10 +1,11 @@
 from __future__ import annotations
+from auditor.rules.config_rule import ConfigViaEnvRule
 from pathlib import Path
 import tempfile
 
 import pytest
-
 from auditor.core import RuleContext
+
 from auditor.rules.config_rule import ConfigViaEnvRule
 
 

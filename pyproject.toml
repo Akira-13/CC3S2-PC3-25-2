@@ -13,3 +13,8 @@ dependencies = []
 [tool.pytest.ini_options]
 addopts = "-q"
 pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["tests/*", ".pytest_cache", "build", "dist"]

@@ -1,0 +1,13 @@
+title = "Repo-Compliance gitleaks config"
+
+[allowlist]
+description = "Ignora secretos sintéticos usados en pruebas"
+# Ignora SOLO estos archivos de prueba (no todo tests/)
+paths = [
+    '''tests/test_rule_secrets_none\.py''',
+    '''tests/test_secrest_multifile\.py'''
+]
+# (Opcional) ignora cadenas 'REDACTED' que aparecen en logs/resultados
+regexes = [
+    '''REDACTED'''
+]
