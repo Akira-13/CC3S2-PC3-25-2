@@ -3,12 +3,6 @@ from pathlib import Path
 import importlib
 import pytest
 
-# Guardia por RuleContext (A)
-import importlib as _il
-_core = _il.import_module("auditor.core")
-if not hasattr(_core, "RuleContext"):
-    pytest.skip("RuleContext pendiente: se omite este módulo", allow_module_level=True)
-
 from auditor.core import RuleContext
 
 def _get_coverage_rule():

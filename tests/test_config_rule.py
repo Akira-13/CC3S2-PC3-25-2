@@ -1,20 +1,9 @@
-import importlib
-_core = importlib.import_module("auditor.core")
-if not hasattr(_core, "RuleContext"):
-    pytest.skip("RuleContext pendiente : se omite por ahora", allow_module_level=True)
-from auditor.core import RuleContext
-
-from auditor.rules.config_rule import ConfigViaEnvRule
 from __future__ import annotations
+from auditor.rules.config_rule import ConfigViaEnvRule
 from pathlib import Path
 import tempfile
 
 import pytest
-
-import importlib
-_core = importlib.import_module("auditor.core")
-if not hasattr(_core, "RuleContext"):
-    pytest.skip("RuleContext pendiente : se omite por ahora", allow_module_level=True)
 from auditor.core import RuleContext
 
 from auditor.rules.config_rule import ConfigViaEnvRule
