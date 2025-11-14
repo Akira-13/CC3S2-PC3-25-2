@@ -26,7 +26,7 @@ jobs:
 
       - name: Run compliance auditor
         run: |
-          python -m auditor --repo . --output report.json --ignore-dirs tests --fail-on high
+          python -m auditor --repo . --output report.json --ignore-dirs tests hooks --fail-on high
 
       - name: Upload audit report artifact
         if: always()
