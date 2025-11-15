@@ -19,12 +19,17 @@ class ConfigViaEnvRule(Rule):
     id = "R002"
     description = "La configuración debe provenir de variables de entorno (no archivos estáticos)"
 
-    def _python_files(self, root: Path) -> List[Path]:
-        return [p for p in root.rglob("*.py") if "/.venv/" not in str(p)]
+    def _python_files(self, root: Path, ignore_dirs: List[str]) -> List[Path]:
+        files = []
+        for p in root.rglob("*.py"):
+            if any(ignored in p.parts for ignored in ignore_dirs):
+                continue
+            files.append(p)
+        return files
 
-    def _has_env_usage(self, root: Path) -> bool:
+    def _has_env_usage(self, root: Path, ignore_dirs: List[str]) -> bool:
         env_pat = re.compile(r"\bos\.environ\b|\benviron\[|\bos\.getenv\s*\(", re.IGNORECASE)
-        for py in self._python_files(root):
+        for py in self._python_files(root, ignore_dirs):
             for line in read_lines(py):
                 if env_pat.search(line):
                     return True
@@ -44,7 +49,7 @@ class ConfigViaEnvRule(Rule):
 
     def check(self, ctx: RuleContext) -> List[Finding]:
         root = Path(ctx.repo_root)
-        uses_env = self._has_env_usage(root)
+        uses_env = self._has_env_usage(root, ctx.ignore_dirs)
         static_files = self._has_static_configs(root)
 
         if not uses_env and static_files:
