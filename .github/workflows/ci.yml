@@ -37,8 +37,8 @@ jobs:
             -   name: Tests + coverage XML
                 run: pytest -vv --maxfail=1 --cov=auditor --cov-report=term-missing --cov-report=xml
 
-            -   name: Coverage gate (≥85%)
-                run: python tools/read_coverage.py 85
+            -   name: Coverage gate (≥90%)
+                run: python tools/read_coverage.py 90
 
             -   name: Secret scan (gitleaks)
                 uses: zricethezav/gitleaks-action@v2
