@@ -56,6 +56,11 @@ test:
   Instala y ejecuta **ruff** sobre `auditor/` y `tests/` para aplicar estilo y calidad.
 * `make run`
   Alias para ejecutar los tests rápidamente.
+* `make audit`
+  Ejecuta el auditor sobre el repositorio actual y genera `report.json`.
+* `make publish-report`
+  Publica el reporte de auditoría en GitHub Projects (requiere configuración de tokens).
+
 
 ## Inicio rápido
 
@@ -139,3 +144,20 @@ python tools/read_coverage.py 85
 * **Lint** con `ruff`.
 * **Tests + coverage** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
 * Escaneo de secretos (acción separada en el pipeline).
+
+### Workflow de Compliance Audit
+
+El archivo `.github/workflows/compliance.yml` ejecuta automáticamente el auditor en cada pull request:
+
+**Características:**
+- Se activa en cada PR para validar cumplimiento antes de mergear
+- Ejecuta `python -m auditor` con flag `--fail-on high` (falla si hay hallazgos de severidad alta)
+- Ignora directorios `tests` y `hooks` durante el análisis
+- Sube el reporte `report.json` como artefacto para revisión posterior (disponible incluso si el workflow falla)
+
+**Uso:**
+```bash
+# El workflow se ejecuta automáticamente en PRs
+# Para ver el reporte: Actions → tu workflow → Artifacts → compliance-report
+```
+
