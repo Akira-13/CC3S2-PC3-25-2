@@ -26,12 +26,11 @@ jobs:
         run: |
           python -m auditor --repo . --output report.json --ignore-dirs tests hooks --fail-on high
 
-
-      - name: Upload audit report artifact
+      - name: Upload JSON report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: compliance-report
+          name: compliance-json-report
           path: report.json
 
       - name: Convert JSON to Markdown
