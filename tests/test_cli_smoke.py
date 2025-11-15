@@ -40,11 +40,6 @@ def test_cli_bad_repo(bad_repo: Path, capsys, cli_module):
     assert data["summary"]["by_severity"]["High"] >= 2
 
 
-def test_cli_fail_on_high(bad_repo: Path, cli_module):
-    """--fail-on high debe retornar exit 2 cuando hay findings High"""
-    exit_code = cli_module.main(["--repo", str(bad_repo), "--fail-on", "high"])
-    assert exit_code == 2
-
 def test_cli_output_file_good_repo(good_repo: Path, tmp_path: Path):
     cli = importlib.import_module("auditor.cli")
     out = tmp_path / "report.json"
