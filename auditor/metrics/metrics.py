@@ -319,6 +319,8 @@ def _parse_args(argv=None):
     p.add_argument("--out-metrics", default="auditor/metrics/metrics.json")
     p.add_argument("--out-csv", default="auditor/metrics/metrics.csv")
     p.add_argument("--out-trends", default="auditor/metrics/trends.json")
+    p.add_argument("--metrics-dir", default=".metrics", help="Directorio para almacenar métricas históricas")
+    p.add_argument("--demo", action="store_true", help="Modo demo: genera métricas sin llamar a GitHub API")
     return p.parse_args(argv)
 
 
@@ -344,21 +346,40 @@ def main(argv=None) -> int:
         print(f"[metrics] Usando repo: {args.repo}")
 
     try:
-        metrics = compute_metrics_for_pr(
-            repo=args.repo,
-            pr_number=args.pr_number,
-            workflow_id_or_file=args.workflow,
-            report=report,
-        )
+        if args.demo:
+            # Demo mode: generate mock metrics without GitHub API
+            sev_counts = compute_severity_counts(report)
+            trend = compute_trend(sev_counts)
+            
+            metrics = Metrics(
+                pr_number=args.pr_number,
+                severity_counts=sev_counts,
+                cycle_time_hours=24.5,
+                approval_time_hours=2.1,
+                remediation_time_hours=1.8,
+                blocked_time_hours=0.5,
+                trend=trend,
+            )
+        else:
+            metrics = compute_metrics_for_pr(
+                repo=args.repo,
+                pr_number=args.pr_number,
+                workflow_id_or_file=args.workflow,
+                report=report,
+            )
     except Exception as exc:
         print(f"[metrics] Error calculando métricas: {exc}")
         return 2
 
+    # Create metrics directory if it doesn't exist
+    metrics_dir = Path("auditor/metrics")
+    metrics_dir.mkdir(exist_ok=True)
+    
     save_metrics_json(metrics, Path(args.out_metrics))
     save_metrics_csv(metrics, Path(args.out_csv))
     save_trends_json(metrics, Path(args.out_trends))
 
-    print("[metrics] Métricas generadas correctamente.")
+    print(f"[metrics] Métricas generadas correctamente. {'(Modo demo)' if args.demo else ''}")
     return 0
 
 
