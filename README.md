@@ -13,21 +13,21 @@ Estructura mínima del auditor con las primeras reglas y un flujo de trabajo imp
 
 ## Estructura del proyecto (parcial)
 
-```
 auditor/
-  core.py            # Finding, Severity, RuleContext, run_rules
-  utils/fs.py        # Helpers del sistema de archivos
-  rules/
-    gitignore_rule.py  # R001
-    config_rule.py     # R002
-    makefile_rule.py   # R003
-    license_rule.py    # R004
-    coverage_rule.py   # R005
-    secrets_rule.py    # R006
+core.py            # Finding, Severity, RuleContext, run_rules
+utils/fs.py        # Helpers del sistema de archivos
+rules/
+gitignore_rule.py  # R001
+config_rule.py     # R002
+makefile_rule.py   # R003
+license_rule.py    # R004
+coverage_rule.py   # R005
+secrets_rule.py    # R006
 tests/
 Makefile
 pyproject.toml
-```
+
+````
 
 ## Make: puntos de entrada principales
 
@@ -37,16 +37,16 @@ El Makefile es la interfaz principal para los flujos de trabajo locales y los ho
 .PHONY: test lint run
 
 run:
-	python -m pytest -q
+    python -m pytest -q
 
 lint:
-	python -m pip install ruff >/dev/null 2>&1 || true
-	ruff check auditor tests
+    python -m pip install ruff >/dev/null 2>&1 || true
+    ruff check auditor tests
 
 test:
-	python -m pip install -r requirements-dev.txt >/dev/null 2>&1 || true
-	pytest -q
-```
+    python -m pip install -r requirements-dev.txt >/dev/null 2>&1 || true
+    pytest -q
+````
 
 ### Objetivos
 
@@ -132,7 +132,7 @@ pytest -vv --cov=auditor --cov-report=term-missing --cov-report=xml
 python tools/read_coverage.py 85
 ```
 
-> Estado actual: **~93%** de cobertura (pasa el gate de S1 con holgura).
+> Estado actual: **~93–94%** de cobertura (pasa el gate de S1 con holgura).
 
 ## Notas útiles para correr localmente
 
@@ -142,7 +142,7 @@ python tools/read_coverage.py 85
 ## CI (S1) — verificación de calidad
 
 * **Lint** con `ruff`.
-* **Tests + coverage** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
+* **Tests + cobertura** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
 * Escaneo de secretos (acción separada en el pipeline).
 
 ### Workflow de Compliance Audit
@@ -160,4 +160,103 @@ El archivo `.github/workflows/compliance.yml` ejecuta automáticamente el audito
 # El workflow se ejecuta automáticamente en PRs
 # Para ver el reporte: Actions → tu workflow → Artifacts → compliance-report
 ```
+
+---
+
+## Pruebas de integración y gates 
+
+En el segundo sprint se extendió la suite de pruebas para validar no solo las reglas individuales, sino también el comportamiento de la CLI y su integración con el workflow de compliance.
+
+### Smokes avanzados de CLI
+
+Se agregaron pruebas que ejercitan la CLI en escenarios más cercanos al uso real:
+
+* **CLI sobre repos sintéticos con cobertura:**
+
+  * `test_cli_good_repo` genera un `coverage.xml` sintético con `line-rate=0.95` sobre `good_repo` y verifica que:
+
+    * la ejecución de `auditor.cli.main` retorne código `0`,
+    * el resumen (`summary.total`) reporte **0 findings**.
+  * `test_cli_bad_repo` ejecuta la CLI sobre `bad_repo` y comprueba que:
+
+    * se activen las reglas esperadas (`R001`, `R002`, `R003`, `license.present`, `R005`),
+    * haya al menos varios findings de severidad **High**,
+    * el exit code siga siendo `0` cuando el umbral es `--fail-on none`.
+
+* **Flag `--fail-on`:**
+
+  * `test_cli_fail_on_high` valida que, frente a un repositorio con hallazgos High, usar `--fail-on high` hace que la CLI retorne código `2`.
+  * `test_cli_fail_on_levels` parametriza los niveles `none`, `low`, `medium`, `high` sobre un repo con problemas y comprueba que el código de salida cambia según el umbral configurado, cubriendo completamente la lógica de mapeo de severidades en la CLI.
+
+* **Salida a archivo (`--output`):**
+
+  * `test_cli_output_file_good_repo` asegura que, al usar `--output report.json` sobre `good_repo`, se genera un archivo JSON válido que contiene:
+
+    * `repo_root` con la ruta evaluada,
+    * `summary.total == 0`.
+
+### Validación de `--ignore-dirs` y reglas de secretos
+
+Se añadió una prueba específica para comprobar que la CLI respeta directorios ignorados al buscar secretos:
+
+* **Ignorar directorios con posibles secretos:**
+
+  * `test_cli_ignore_dirs_skips_secrets_in_tests` construye un repo sintético con:
+
+    * código “limpio” en `src/app.py`,
+    * una asignación sospechosa (`API_KEY = ...`) dentro de `tests/test_app.py`,
+    * un `coverage.xml` válido para no disparar la regla de cobertura.
+  * La prueba ejecuta la CLI con:
+
+    ```bash
+    --ignore-dirs tests
+    ```
+
+    captura la salida en JSON y verifica que:
+
+    * el código de salida sea `0`,
+    * no aparezcan findings con `rule_id == "R006"`, demostrando que `SecretsRule` respeta los directorios ignorados configurados en `RuleContext`.
+
+### Contrato del workflow de compliance (tests tipo “mini E2E”)
+
+Para reflejar fielmente el comportamiento del workflow definido en `.github/workflows/compliance.yml`, se añadieron pruebas que ejecutan exactamente el mismo comando que corre en CI, pero contra repos sintéticos:
+
+* **Comando del workflow sobre repo sano:**
+
+  * `test_workflow_command_good_repo`:
+
+    * genera `coverage.xml` con `line-rate=0.95` en `good_repo`,
+    * ejecuta:
+
+      ```bash
+      python -m auditor --repo <good_repo> \
+                        --output report.json \
+                        --ignore-dirs tests hooks \
+                        --fail-on high
+      ```
+    * valida que el exit code sea `0` y que `summary.total == 0`.
+
+* **Comando del workflow sobre repo con problemas:**
+
+  * `test_workflow_command_bad_repo`:
+
+    * ejecuta el mismo comando sobre `bad_repo`,
+    * comprueba que:
+
+      * el exit code sea `2` (hay hallazgos de severidad High),
+      * el reporte JSON contenga findings,
+      * el resumen agregue al menos un hallazgo de severidad **High**.
+
+Estas pruebas actúan como una “simulación local” del pipeline de compliance: si pasan en local, el mismo comando que corre en GitHub Actions debería comportarse igual, bloqueando PRs con problemas y dejando pasar repositorios que cumplen todas las reglas.
+
+### Cobertura y calidad
+
+La ampliación de la suite de tests en este sprint mantiene la cobertura del módulo `auditor/` por encima del 90% y da mayor confianza en:
+
+* el contrato de la CLI (parámetros, códigos de salida, estructura del JSON),
+* la interacción entre reglas (incluida la de cobertura),
+* el comportamiento de `--fail-on` como gate de severidad,
+* el efecto de `--ignore-dirs` en reglas de análisis estático como `SecretsRule`.
+
+La combinación de estos tests unitarios y de “mini E2E” facilita interpretar los resultados del workflow de compliance y explicar por qué un pull request es bloqueado o aceptado según las políticas definidas.
 
