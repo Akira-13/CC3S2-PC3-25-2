@@ -16,4 +16,4 @@ audit:
 	@echo "Reporte JSON en report.json"
 
 publish-report:
-	python tools/publish-to-project.py --report report.json
+	python tools/publish_to_project.py --report report.json
