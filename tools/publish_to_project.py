@@ -283,18 +283,15 @@ class GitHubProjectsClient:
         
         mutation = """
         mutation($projectId: ID!, $title: String!, $body: String!) {
-        addProjectV2DraftIssue(input: {
+          addProjectV2DraftIssue(input: {
             projectId: $projectId
             title: $title
             body: $body
-        }) {
+          }) {
             projectItem {
-            id
+              id
             }
-            draftIssue {
-            id
-            }
-        }
+          }
         }
         """
         
@@ -305,10 +302,35 @@ class GitHubProjectsClient:
         }
         
         data = self._execute_graphql(mutation, variables)
-        item_id = data["addProjectV2DraftIssue"]["draftIssue"]["id"]
-        
-        logging.info("Created new project item: %s", item_id)
-        return item_id
+        project_item_id = data["addProjectV2DraftIssue"]["projectItem"]["id"]
+
+        # Consultar el DraftIssue.id desde el projectItem recién creado
+        query = """
+        query($itemId: ID!) {
+          node(id: $itemId) {
+            ... on ProjectV2Item {
+              content {
+                ... on DraftIssue {
+                  id
+                }
+              }
+            }
+          }
+        }
+        """
+        draft = self._execute_graphql(query, {"itemId": project_item_id})
+        draft_id = (
+            draft.get("node", {})
+                 .get("content", {})
+                 .get("id")
+        )
+        if not draft_id:
+            # Como fallback, devolver el projectItem y dejar que publish_to_project re-busque por item_key
+            logging.warning("No DraftIssue id yet. Returning projectItem id as fallback.")
+            return project_item_id
+
+        logging.info("Created new project item (draft issue): %s", draft_id)
+        return draft_id
 
     def update_fields(
         self,
