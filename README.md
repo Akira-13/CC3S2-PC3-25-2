@@ -1,5 +1,7 @@
 # Auditor de Repositorio
 
+* Videos: https://drive.google.com/drive/folders/18TawdGPUfcHBPnMcYzzRQUUV_AHDQN2W?usp=sharing
+
 Estructura mínima del auditor con las primeras reglas y un flujo de trabajo impulsado por Makefile.
 
 ## Reglas implementadas
