@@ -11,18 +11,34 @@ Estructura mínima del auditor con las primeras reglas y un flujo de trabajo imp
 * **R005**: La cobertura de código debe ser de al menos 90% (verifica archivo coverage.xml).
 * **R006**: No deben existir secretos expuestos en el código (API keys, tokens, contraseñas, etc.).
 
-## Estructura del proyecto (parcial)
+## Renderizador de Reportes
+
+El módulo de reporting permite generar informes en formato Markdown a partir de los resultados del auditor.
+
+1. **Generar el reporte JSON**:
+   ```bash
+   python -m auditor --repo . --output report.json
+   ```
+
+2. **Convertir a Markdown**:
+   ```bash
+   python -m auditor.reporting.md_renderer --input report.json --output report.md
+   ```
+
+## Estructura del proyecto
 
 auditor/
-core.py            # Finding, Severity, RuleContext, run_rules
-utils/fs.py        # Helpers del sistema de archivos
-rules/
-gitignore_rule.py  # R001
-config_rule.py     # R002
-makefile_rule.py   # R003
-license_rule.py    # R004
-coverage_rule.py   # R005
-secrets_rule.py    # R006
+  core.py            # Finding, Severity, RuleContext, run_rules
+  reporting/         # Módulo de generación de reportes
+    md_renderer.py   # Generador de reportes Markdown
+  utils/fs.py        # Helpers del sistema de archivos
+  rules/
+    gitignore_rule.py  # R001
+    config_rule.py     # R002
+    makefile_rule.py   # R003
+    license_rule.py    # R004
+    coverage_rule.py   # R005
+    secrets_rule.py    # R006
 tests/
 Makefile
 pyproject.toml
@@ -60,6 +76,7 @@ test:
   Ejecuta el auditor sobre el repositorio actual y genera `report.json`.
 * `make publish-report`
   Publica el reporte de auditoría en GitHub Projects (requiere configuración de tokens).
+
 
 ## Inicio rápido
 
@@ -144,21 +161,17 @@ python tools/read_coverage.py 85
 * **Tests + cobertura** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
 * Escaneo de secretos (acción separada en el pipeline).
 
----
-
-## Workflow de Compliance Audit
+### Workflow de Compliance Audit
 
 El archivo `.github/workflows/compliance.yml` ejecuta automáticamente el auditor en cada pull request:
 
 **Características:**
-
-* Se activa en cada PR para validar cumplimiento antes de mergear.
-* Ejecuta `python -m auditor` con flag `--fail-on high` (falla si hay hallazgos de severidad alta).
-* Ignora directorios `tests` y `hooks` durante el análisis.
-* Sube el reporte `report.json` como artefacto para revisión posterior (disponible incluso si el workflow falla).
+- Se activa en cada PR para validar cumplimiento antes de mergear
+- Ejecuta `python -m auditor` con flag `--fail-on high` (falla si hay hallazgos de severidad alta)
+- Ignora directorios `tests` y `hooks` durante el análisis
+- Sube el reporte `report.json` como artefacto para revisión posterior (disponible incluso si el workflow falla)
 
 **Uso:**
-
 ```bash
 # El workflow se ejecuta automáticamente en PRs
 # Para ver el reporte: Actions → tu workflow → Artifacts → compliance-report
