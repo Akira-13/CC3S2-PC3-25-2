@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m auditor --repo . --output report.json --ignore-dirs tests hooks --fail-on high
 
+
       - name: Upload audit report artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -69,4 +70,5 @@ jobs:
                 body: 'Error generating compliance report. Check workflow logs for details.'
               });
             }
+
 
