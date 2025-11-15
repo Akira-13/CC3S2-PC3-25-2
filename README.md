@@ -139,3 +139,29 @@ python tools/read_coverage.py 85
 * **Lint** con `ruff`.
 * **Tests + coverage** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
 * Escaneo de secretos (acción separada en el pipeline).
+
+---
+
+## Herramientas adicionales
+
+### Publicador de GitHub Projects
+
+El directorio `tools/` incluye `publish-to-project.py`, una herramienta para publicar automáticamente los resultados del auditor en GitHub Projects V2.
+
+**Características:**
+- Publica resúmenes de hallazgos en tarjetas de proyecto
+- Idempotente: actualiza tarjetas existentes en lugar de crear duplicados
+- Soporta seguimiento de tendencias entre sprints
+- Integración vía API GraphQL de GitHub
+
+**Uso rápido:**
+```bash
+export GITHUB_TOKEN="tu_token"
+python tools/publish-to-project.py \
+  --report report.json \
+  --owner Akira-13 \
+  --project-number 1 \
+  --item-key "repo:CC3S2-PC3-25-2"
+```
+
+Ver `tools/README.md` para documentación completa.
