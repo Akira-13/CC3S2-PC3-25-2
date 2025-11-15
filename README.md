@@ -276,3 +276,5 @@ La ampliación de la suite de tests en este sprint mantiene la cobertura del mó
 
 La combinación de estos tests unitarios y de “mini E2E” facilita interpretar los resultados del workflow de compliance y explicar por qué un pull request es bloqueado o aceptado según las políticas definidas.
 
+#   T e s t   c h a n g e  
+ 
