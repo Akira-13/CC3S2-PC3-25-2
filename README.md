@@ -276,3 +276,29 @@ La ampliación de la suite de tests en este sprint mantiene la cobertura del mó
 
 La combinación de estos tests unitarios y de “mini E2E” facilita interpretar los resultados del workflow de compliance y explicar por qué un pull request es bloqueado o aceptado según las políticas definidas.
 
+
+---
+
+## Herramientas adicionales
+
+### Publicador de GitHub Projects
+
+El directorio `tools/` incluye `publish-to-project.py`, una herramienta para publicar automáticamente los resultados del auditor en GitHub Projects V2.
+
+**Características:**
+- Publica resúmenes de hallazgos en tarjetas de proyecto
+- Idempotente: actualiza tarjetas existentes en lugar de crear duplicados
+- Soporta seguimiento de tendencias entre sprints
+- Integración vía API GraphQL de GitHub
+
+**Uso rápido:**
+```bash
+export GITHUB_TOKEN="tu_token"
+python tools/publish-to-project.py \
+  --report report.json \
+  --owner Akira-13 \
+  --project-number 1 \
+  --item-key "repo:CC3S2-PC3-25-2"
+```
+
+Ver `tools/README.md` para documentación completa.
