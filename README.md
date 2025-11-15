@@ -61,6 +61,7 @@ test:
 * `make publish-report`
   Publica el reporte de auditoría en GitHub Projects (requiere configuración de tokens).
 
+
 ## Inicio rápido
 
 ```bash
@@ -144,21 +145,17 @@ python tools/read_coverage.py 85
 * **Tests + cobertura** con `pytest` y **gate** de cobertura usando `tools/read_coverage.py 85`.
 * Escaneo de secretos (acción separada en el pipeline).
 
----
-
-## Workflow de Compliance Audit
+### Workflow de Compliance Audit
 
 El archivo `.github/workflows/compliance.yml` ejecuta automáticamente el auditor en cada pull request:
 
 **Características:**
-
-* Se activa en cada PR para validar cumplimiento antes de mergear.
-* Ejecuta `python -m auditor` con flag `--fail-on high` (falla si hay hallazgos de severidad alta).
-* Ignora directorios `tests` y `hooks` durante el análisis.
-* Sube el reporte `report.json` como artefacto para revisión posterior (disponible incluso si el workflow falla).
+- Se activa en cada PR para validar cumplimiento antes de mergear
+- Ejecuta `python -m auditor` con flag `--fail-on high` (falla si hay hallazgos de severidad alta)
+- Ignora directorios `tests` y `hooks` durante el análisis
+- Sube el reporte `report.json` como artefacto para revisión posterior (disponible incluso si el workflow falla)
 
 **Uso:**
-
 ```bash
 # El workflow se ejecuta automáticamente en PRs
 # Para ver el reporte: Actions → tu workflow → Artifacts → compliance-report
