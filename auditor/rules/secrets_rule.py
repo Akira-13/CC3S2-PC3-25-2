@@ -45,6 +45,9 @@ class SecretsRule(Rule):
         for file_path in repo.rglob("*"):
             if not file_path.is_file() or self._is_ignored(file_path):
                 continue
+            # Saltear directorios ignorados
+            if any(ignored in file_path.parts for ignored in ctx.ignore_dirs):
+                continue
                 
             try:
                 for line_num, line in enumerate(read_lines(file_path), 1):

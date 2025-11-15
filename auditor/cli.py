@@ -49,6 +49,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Ej: --fail-on high -> exit 2 si existe algún High"
         ),
     )
+    p.add_argument(
+        "--ignore-dirs",
+        nargs="*",
+        default=[],
+        help="Directorios a ignorar durante el análisis (ej: .venv tests)",
+    )
     return p.parse_args(argv)
 
 def _threshold_to_level(name: str) -> int:
@@ -64,7 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     repo_root = str(Path(args.repo).resolve())
 
-    ctx = RuleContext(repo_root)
+    ctx = RuleContext(repo_root, ignore_dirs=args.ignore_dirs)
     rules = [
         GitignoreEnvRule(),
         ConfigViaEnvRule(),

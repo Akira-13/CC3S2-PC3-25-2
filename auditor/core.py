@@ -18,8 +18,9 @@ class Finding:
     meta: Dict[str, Any] | None = None
 
 class RuleContext:
-    def __init__(self, repo_root: str):
+    def __init__(self, repo_root: str, ignore_dirs: list[str] | None = None):
         self.repo_root = repo_root
+        self.ignore_dirs = ignore_dirs or []
 
 class Rule(Protocol):
     id: str
