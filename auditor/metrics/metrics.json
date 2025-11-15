@@ -1,0 +1,17 @@
+{
+  "summary": {
+    "total": 8,
+    "by_severity": {
+      "High": 6,
+      "Medium": 2,
+      "Low": 0
+    }
+  },
+  "findings": [],
+  "time_metrics": {
+    "cycle_time_hours": 114.085,
+    "approval_time_hours": null,
+    "remediation_time_hours": null,
+    "blocked_time_hours": null
+  }
+}

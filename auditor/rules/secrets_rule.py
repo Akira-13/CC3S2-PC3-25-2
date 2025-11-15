@@ -25,7 +25,8 @@ class SecretsRule(Rule):
         "*.json",
         "*.xml",
         "*.yaml",
-        "*.yml"
+        "*.yml",
+        "*.env"
     }
     
     def _compile_patterns(self) -> list[Pattern]:
@@ -45,11 +46,17 @@ class SecretsRule(Rule):
         for file_path in repo.rglob("*"):
             if not file_path.is_file() or self._is_ignored(file_path):
                 continue
+            # Saltear directorios ignorados
+            if any(ignored in file_path.parts for ignored in ctx.ignore_dirs):
+                continue
                 
             try:
                 for line_num, line in enumerate(read_lines(file_path), 1):
                     for pattern in patterns:
                         if pattern.search(line):
+                            # Ignorar usos legítimos de os.getenv
+                            if "os.getenv" in line or "os.environ" in line:
+                                continue
                             findings.append(
                                 Finding(
                                     rule_id=self.id,

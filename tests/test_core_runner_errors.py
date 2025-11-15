@@ -3,16 +3,6 @@ from dataclasses import dataclass
 import importlib
 import pytest
 
-# Guardia por core completo
-try:
-    core = importlib.import_module("auditor.core")
-except ModuleNotFoundError:
-    pytest.skip("auditor.core no disponible", allow_module_level=True)
-
-required = {"Rule", "RuleContext", "run_rules", "Finding", "Severity"}
-if not required.issubset(set(dir(core))):
-    pytest.skip("Tipos del core incompletos: se omite este módulo", allow_module_level=True)
-
 from auditor.core import Rule, RuleContext, run_rules, Finding, Severity
 
 
