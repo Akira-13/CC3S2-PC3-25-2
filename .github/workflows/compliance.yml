@@ -1,5 +1,10 @@
 name: Compliance Audit with Artifact Upload
 
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
 on:
   pull_request:
 
