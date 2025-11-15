@@ -74,3 +74,8 @@ jobs:
                 body: 'Error generating compliance report. Check workflow logs for details.'
               });
             }
+      - name: Render summary.md desde metrics/current.json
+        run: |
+          python tools/render_summary.py \
+            --input metrics/current.json \
+            --output reports/summary.md
